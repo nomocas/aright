@@ -1,7 +1,9 @@
-(function() {
+(function(global) {
 	'use strict';
 
-	function error(errors, rule, parent, key, path) {
+	var replaceShouldBeRegExp = /%s/g;
+
+	function error(errors, rule, parent, key, path, shouldBe) {
 		if (path && key)
 			path += '.';
 		path = key ? (path + key) : path;
@@ -10,36 +12,42 @@
 			path = '.';
 
 		errors.valid = false;
-		(errors[path] = errors[path] || []).push({
-			msg: i18n(rule) || 'missing error message',
-			value: key ? parent[key] : parent
-		});
+		errors.map[path] = errors.map[path] || {
+			value: key ? parent[key] : parent,
+			errors: []
+		};
+		var msg = i18n(rule);
+		if (!msg)
+			msg = 'missing error message for ' + rule;
+		if (shouldBe)
+			msg = msg.replace(replaceShouldBeRegExp, shouldBe);
+		errors.map[path].errors.push(msg);
 		return false;
 	}
 
 	var i18n = function(rule, language) {
-		var space = i18n.languages[language || i18n.currentLanguage];
+		var space = i18n.data[language || i18n.currentLanguage];
 		return space[rule];
-	}
+	};
 
-	i18n.currentLanguage = 'fr';
-	i18n.languages = {
-		fr: {
-			string: "ceci n'est pas une string.",
-			object: "ceci n'est pas un objet.",
-			array: "ceci n'est pas une array.",
-			'boolean': "ceci n'est pas un bool.",
-			number: "ceci n'est pas un nombre.",
-			'enum': "enumerable non respecté.",
-			'null': "devrait être null.",
-			email: "email invalide.",
-			phone: "téléphone invalide.",
-			unvalidated: "propriété non prévue.",
-			missing: "propriété manquante.",
-			minLength: "trop court",
-			maxLength: "trop long",
-			minimum: "trop petit",
-			maximum: "trop grand"
+	i18n.currentLanguage = 'en';
+	i18n.data = {
+		en: {
+			string: "should be a string",
+			object: "should be an object",
+			array: "should be an array",
+			'boolean': "should be a boolean",
+			number: "should be a number",
+			'null': "should be null",
+			'enum': "enum failed (should be one of : %s)",
+			equal: "equality failed (should be : %s)",
+			format: "format failed",
+			unmanaged: "unmanaged property",
+			missing: "missing property",
+			minLength: "too short (length should be at least : %s)",
+			maxLength: "too long (length should be at max : %s)",
+			minimum: "too small (should be at minimum : %s)",
+			maximum: "too big (should be at max : %s)"
 		}
 	};
 
@@ -48,16 +56,11 @@
 		phone: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/gi
 	};
 
-	var Validator = function() {
-		this._rules = {};
-	};
-
 	function is(type) {
 		return function() {
 			return this.exec('this', function(input, path) {
-				// console.log("is : ", type, input, path);
 				if (typeof input !== type)
-					return error(this, type, input, null, path);
+					return error(this, type, input, null, path, type);
 				return true;
 			});
 		};
@@ -72,7 +75,7 @@
 					return true;
 				}
 				if (typeof input[name] !== type)
-					return error(this, type, input, name, path);
+					return error(this, type, input, name, path, type);
 				if (!rule)
 					return true;
 				return rule.call(this, input[name], path ? (path + '.' + name) : name);
@@ -82,14 +85,20 @@
 
 	//_______________________________ VALIDATOR
 
+	var Validator = function() {
+		this._rules = {};
+	};
+
 	Validator.prototype = {
 		validate: function(input) {
 			var errors = {
-				valid: true
+				valid: true,
+				map: {}
 			};
 			this.call(errors, input, '');
 			if (errors.valid)
 				return true;
+			errors.value = input;
 			return errors;
 		},
 		call: function(errors, entry, path) {
@@ -125,7 +134,7 @@
 
 			for (i in keys)
 				if (keys[i])
-					ok = error(errors, 'unvalidated', entry, i, path);
+					ok = error(errors, 'unmanaged', entry, i, path);
 			return ok;
 		},
 		exec: function(key, rule) {
@@ -151,7 +160,7 @@
 				return rule.call(this, input, path);
 			});
 		},
-		// ___________________________________ base
+		// ___________________________________ 
 		required: function(yes) {
 			this.required = yes;
 			return this;
@@ -159,28 +168,28 @@
 		minLength: function(min) {
 			return this.exec('this', function(input, path) {
 				if (input.length < min)
-					return error(this, 'minLength', input, null, path);
+					return error(this, 'minLength', input, null, path, min);
 				return true;
 			});
 		},
 		maxLength: function(max) {
 			return this.exec('this', function(input, path) {
 				if (input.length > max)
-					return error(this, 'maxLength', input, null, path);
+					return error(this, 'maxLength', input, null, path, max);
 				return true;
 			});
 		},
 		minimum: function(min) {
 			return this.exec('this', function(input, path) {
 				if (input < min)
-					return error(this, 'minimum', input, null, path);
+					return error(this, 'minimum', input, null, path, min);
 				return true;
 			});
 		},
 		maximum: function(max) {
 			return this.exec('this', function(input, path) {
 				if (input > max)
-					return error(this, 'maximum', input, null, path);
+					return error(this, 'maximum', input, null, path, max);
 				return true;
 			});
 		},
@@ -196,8 +205,25 @@
 		enumerable: function(values) {
 			return this.exec('this', function(input, path) {
 				if (values.indexOf(input) === -1)
-					return error(this, 'enum', input, null, path);
+					return error(this, 'enum', input, null, path, values.join(', '));
 				return true;
+			});
+		},
+		item: function(rule) {
+			return this.exec('this', function(input, path) {
+				var self = this,
+					index = 0,
+					ok = true;
+				input.forEach(function(item) {
+					ok = ok && rule.call(self, item, path + '.' + (index++));
+				});
+				return ok;
+			});
+		},
+		equal: function(value) {
+			return this.exec('this', function(input, path) {
+				if (input !== value)
+					return error(this, 'equal', input, name, path, value);
 			});
 		},
 
@@ -243,17 +269,6 @@
 					return true;
 				return rule.call(this, input[name], path ? (path + '.' + name) : name);
 			});
-		},
-		item: function(rule) {
-			return this.exec('this', function(input, path) {
-				var self = this,
-					index = 0,
-					ok = true;
-				input.forEach(function(item) {
-					ok = ok && rule.call(self, item, path + '.' + (index++));
-				});
-				return ok;
-			});
 		}
 	};
 
@@ -262,9 +277,7 @@
 	};
 
 	var rules = {
-		email: v().isString().format('email').minLength(6),
-		phone: v().isString().format('phone').minLength(8),
-		address: v().isObject().string('street').string('city')
+		email: v().isString().format('email').minLength(6)
 	};
 
 	var aright = {
@@ -278,5 +291,5 @@
 	if (typeof module !== 'undefined' && module.exports)
 		module.exports = aright;
 	else
-		this.aright = aright;
-})();
+		global.aright = aright;
+})(this);
