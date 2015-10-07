@@ -1,7 +1,7 @@
 {
   "name": "aright",
   "version": "0.1.0",
-  "description": "Small and fast JS Object validation.",
+  "description": "Small and fast JS Object and Type validation.",
   "main": "index.js",
   "directories": {
     "test": "test"
