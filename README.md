@@ -54,7 +54,7 @@ rule.validate({
 
 
 ```javascript
-y.aright.rules.email.validate('abcdef'); // return error report
+aright.rules.email.validate('abcdef'); // return error report
 // equivalent to :
 v().rule('email').validate('abcdef'); // return error report
 ```
