@@ -2,7 +2,12 @@
 
 Small and fast js objects and types validation.
 
-Allow to describe validation rules with chained API.
+Allow to describe validation rules with compact chained API.
+
+Easy i18n.
+
+Small size (4.0 Ko minified, 1.4 Ko min/gzip).
+
 
 ## Install
 
@@ -14,16 +19,19 @@ bower i aright
 git clone https://github.com/nomocas/aright.git
 ```
 
-## Example
+## Examples
 
 ```javascript
+var v = aright.v;
+
 var rule = v()
 	.isObject()
-	.string('email', v().format('email').required(true).minLength(3))
-	.bool('flag')
+	.string('email', v().format('email').required(false))
+	.number('index', v().equal(24))
+  	.bool('flag')
 	.array('collection',
 		v().item(
-      		v().isString()
+      v().isString()
 		)
 	)
 	.object('child',
@@ -32,16 +40,38 @@ var rule = v()
   	.bool('test');
 
 rule.validate({
-  email:'aa@gg.com',
+  email:'aaa@bbb.com',
+  index:24,
   flag:true,
   collection:['hello'],
   child:{
     title:'hello'
   },
   test:true
-}); // return true
+});
+// => return true
 ```
 
+
+```javascript
+y.aright.rules.email.validate('abcdef'); // return error report
+// equivalent to :
+v().rule('email').validate('abcdef'); // return error report
+```
+
+```javascript
+v().isString().format(/abc/).minLength(6).validate('abcdef');   // return true
+v().isString().enumerable(['bloupi', 'foo']).validate('bloup'); // return error report
+```
+
+## i18n
+
+Take a look to `aright/i18n/fr.js` to have an idea on how customise
+```javascript
+aright.i18n.data.fr = require('aright/i18n/fr');
+aright.i18n.currentLanguage = 'fr';
+// aright errors messages will now be in french
+```
 
 ## Tests
 
