@@ -1,3 +1,7 @@
+/**
+ * @author Gilles Coomans <gilles.coomans@gmail.com>
+ *
+ */
 (function(global) {
 	'use strict';
 
