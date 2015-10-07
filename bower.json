@@ -1,0 +1,26 @@
+{
+  "name": "aright",
+  "main": "index.js",
+  "version": "0.1.0",
+  "authors": [
+    "Gilles Coomans <gilles.coomans@gmail.com>"
+  ],
+  "description": "Small and fast JS Object validation.",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "schema",
+    "validation"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/nomocas/aright",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
