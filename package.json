@@ -1,13 +1,14 @@
 {
   "name": "aright",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Small and fast JS Object and Type validation.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "gulp uglify"
   },
   "repository": {
     "type": "git",
