@@ -1,13 +1,16 @@
 # aright
 
-Small and fast js objects and types validation.
+Small and really fast js objects and types validation (browser or server side).
 
 Allow to describe validation rules with compact chained API.
 
 Easy i18n.
 
-Small size (4.0 Ko minified, 1.4 Ko min/gzip).
+Really fast because it doesn't need schema parsing and interpretation. Rules holds directly an array of nested functions that do the job as fast as possible.
 
+Pure vanilla js, no dependencies.
+
+Small size (4.0 Ko minified, 1.4 Ko min/gzip).
 
 ## Install
 
@@ -63,6 +66,20 @@ v().rule('email').validate('abcdef'); // return error report
 v().isString().format(/abc/).minLength(6).validate('abcdef');   // return true
 v().isString().enumerable(['bloupi', 'foo']).validate('bloup'); // return error report
 ```
+
+## Full API
+
+### is* Family
+
+### properties validation
+
+### value constraints
+
+### array and items
+
+### validation
+
+### custom rule
 
 ## i18n
 
