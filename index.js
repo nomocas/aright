@@ -226,7 +226,8 @@
 		equal: function(value) {
 			return this.exec('this', function(input, path) {
 				if (input !== value)
-					return error(this, 'equal', input, name, path, value);
+					return error(this, 'equal', input, null, path, value);
+				return true;
 			});
 		},
 
