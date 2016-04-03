@@ -231,13 +231,10 @@
 		},
 
 		isObject: is('object'),
-		object: prop('object'),
 		isString: is('string'),
-		string: prop('string'),
-		func: prop('function'),
-		bool: prop('boolean'),
-		number: prop('number'),
-
+		isNumber: is('number'),
+		isBool: is('boolean'),
+		isFunction: is('function'),
 		isArray: function() {
 			return this.exec('this', function(input, path) {
 				if (typeof input !== 'object' && !input.forEach)
@@ -252,6 +249,13 @@
 				return true;
 			});
 		},
+
+
+		object: prop('object'),
+		string: prop('string'),
+		func: prop('function'),
+		bool: prop('boolean'),
+		number: prop('number'),
 		'null': function(name) {
 			return this.exec(name, function(input, path) {
 				if (input[name] !== null)
