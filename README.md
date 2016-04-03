@@ -169,24 +169,16 @@ You need to have mocha installed globally before launching test.
 ```
 > npm install -g mocha
 ```
-Do not forget to install dev-dependencies. i.e. : from 'decompose' folder, type :
+Do not forget to install dev-dependencies. i.e. : from 'aright' folder, type :
 ```
 > npm install
 ```
 
-then, always in 'decompose' folder simply enter :
+then, always in 'aright' folder simply enter :
 ```
 > mocha
 ```
 
-### In the browser
-
-Simply serve "decompose" folder in you favorite web server then open ./index.html.
-
-You could use the provided "gulp web server" by entering :
-```
-> gulp serve-test
-```
 
 
 ## Licence
