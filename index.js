@@ -293,7 +293,8 @@
 		Validator: Validator,
 		rules: rules,
 		i18n: i18n,
-		formats: formats
+		formats: formats,
+		error: error
 	};
 
 	if (typeof module !== 'undefined' && module.exports)
