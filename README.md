@@ -145,11 +145,49 @@ any value could be validated through aright rules by calling .validate( valueToT
 
 ### custom rule
 
-To define custom rules
+To define custom rules :
 
 ```javascript 
 aright.rules.myRule = v().isString().required();
 v().rule('myRule').validate('hello'); // return true
+```
+
+### custom 'this' handler
+
+```javascript
+// handler that act on 'this' (as is* family)
+aright.Validator.prototype.myRule = function(){
+  return this.exec('this', function(input, path){
+  // input is the value to test, and path is its path from root object
+    if(input ...){
+      //...
+      return true;
+    }
+    else
+      return aright.error('some error message...', 'myRule', null, null, path, 'should be a ...')
+  });
+};
+
+v().myRule().validate(...);
+```
+
+### custom property handler
+
+```javascript
+// handler that act on choosen property
+aright.Validator.prototype.myOtherRule = function(propertyName){
+  return this.exec(propertyName, function(input, path){
+  // input is the value to test, and path is its path from root object
+    if(input[propertyName] ...){
+      //...
+      return true;
+    }
+    else
+      return aright.error('some error message...', 'myOtherRule', input, null, path, 'should be a ...')
+  });
+};
+
+v().myRule().validate(...);
 ```
 
 ## i18n
