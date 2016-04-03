@@ -118,7 +118,7 @@
 			if (!ok)
 				return false;
 
-			if (typeof entry !== 'object' || entry.forEach)
+			if (typeof entry !== 'object' || (entry && entry.forEach))
 				return ok;
 
 			var keys = {},
