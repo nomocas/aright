@@ -164,7 +164,7 @@ aright.Validator.prototype.myRule = function(){
       return true;
     }
     else
-      return aright.error('some error message...', 'myRule', null, null, path, 'should be a ...')
+      return aright.error('some error message...', 'myRule', null, null, path, 'string' /* what it should be */)
   });
 };
 
@@ -183,7 +183,7 @@ aright.Validator.prototype.myOtherRule = function(propertyName){
       return true;
     }
     else
-      return aright.error('some error message...', 'myOtherRule', input, null, path, 'should be a ...')
+      return aright.error('some error message...', 'myOtherRule', input, propertyName, path, 'string' /* what it should be */)
   });
 };
 
