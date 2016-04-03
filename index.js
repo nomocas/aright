@@ -237,7 +237,7 @@
 		isFunction: is('function'),
 		isArray: function() {
 			return this.exec('this', function(input, path) {
-				if (typeof input !== 'object' && !input.forEach)
+				if (typeof input !== 'object' || !input.forEach)
 					return error(this, 'array', input, null, path);
 				return true;
 			});
@@ -270,7 +270,7 @@
 						return error(this, 'missing', input, name, path);
 					return true;
 				}
-				if (typeof input[name] !== 'object' && !input[name].forEach)
+				if (typeof input[name] !== 'object' || !input[name].forEach)
 					return error(this, 'array', input, name, path);
 				if (!rule)
 					return true;
