@@ -1,7 +1,7 @@
 {
   "name": "aright",
   "main": "index.js",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "authors": [
     "Gilles Coomans <gilles.coomans@gmail.com>"
   ],
