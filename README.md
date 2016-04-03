@@ -55,7 +55,6 @@ rule.validate({
 // => return true
 ```
 
-
 ```javascript
 aright.rules.email.validate('abcdef'); // return error report
 // equivalent to :
@@ -71,15 +70,87 @@ v().isString().enumerable(['bloupi', 'foo']).validate('bloup'); // return error 
 
 ### is* Family
 
+.isString(), isNumber(), .isBool(), .isObject(), .isArray(), .isFunction(), .isNull()
+
+```javascript
+v().isNull().validate(null); //return true
+```
+
 ### properties validation
+
+.bool(propName), .number(propName), .string(propName), .func(propName), .null(propName), .object(propName), .array(propName) 
+
+```javascript
+v().string('title', v().required())
+.bool('published', v().equal(false))
+.number('count')
+.validate({
+  title:'hello world',
+  published:false,
+  count:12
+}); //return true
+```
 
 ### value constraints
 
+.required(), .minLength(5), .maxLength(3), .minimum(7), .maximum(9), .enumerable(['foo', 'bar']), .equal('my value')
+
+
+```javascript
+v().required().validate(undefined); // return error report
+
+v().equal(12).validate(1); // return error report
+
+//...
+```
+
+####  value format 
+Validate value against regExp
+
+```javascript
+v().format(/abc/gi).validate('abc'); // return true
+```
+
+To define custom format : 
+```javascript
+aright.formats.myFormat = /abc/gi;
+v().format('myFormat').validate('abc'); // return true
+```
+
+As predefined format there is only email for the moment...
+```javascript
+v().format('email').validate('john@doe.com'); // return true
+```
+
 ### array and items
+Both work together :
+
+```javascript 
+var o =  {
+  collection:['foo', 'bar', 'zoo']
+};
+
+v().isObject()
+.array('collection',
+  v().item(
+    v().isString()
+  )
+)
+.validate(o); // return true
+```
 
 ### validation
 
+any value could be validated through aright rules by calling .validate( valueToTest ).
+
 ### custom rule
+
+To define custom rules
+
+```javascript 
+aright.rules.myRule = v().isString().required();
+v().rule('myRule').validate('hello'); // return true
+```
 
 ## i18n
 
