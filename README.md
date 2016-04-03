@@ -6,7 +6,7 @@ Allow to describe validation rules with compact chained API.
 
 Easy i18n.
 
-Really fast because it doesn't need schema parsing and interpretation. Rules holds directly an array of nested functions that do the job as fast as possible.
+Really fast because it doesn't need schema parsing and interpretation. Rules holds directly an array of simple functions that do the job as fast as possible.
 
 Pure vanilla js, no dependencies.
 
