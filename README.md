@@ -6,7 +6,7 @@ Allow to describe validation rules with compact chained API.
 
 Easy i18n.
 
-Really fast because it doesn't need schema parsing and interpretation. Rules holds directly an array of nested functions that do the job as fast as possible.
+Really fast because it doesn't need schema parsing and interpretation. Rules holds directly an array of simple functions that do the job as fast as possible.
 
 Pure vanilla js, no dependencies.
 
@@ -93,8 +93,9 @@ v().string('title', v().required())
 
 ### value constraints
 
-.required(), .minLength(5), .maxLength(3), .minimum(7), .maximum(9), .enumerable(['foo', 'bar']), .equal('my value')
+.required(false), .minLength(5), .maxLength(3), .minimum(7), .maximum(9), .enumerable(['foo', 'bar']), .equal('my value')
 
+Any value is required by default. Ony undefined will be seen as missing.
 
 ```javascript
 v().required().validate(undefined); // return error report
@@ -157,14 +158,14 @@ v().rule('myRule').validate('hello'); // return true
 ```javascript
 // handler that act on 'this' (as is* family)
 aright.Validator.prototype.myRule = function(){
-  return this.exec('this', function(input, path){
+  return this.enqueue('this', function(input, path){
   // input is the value to test, and path is its path from root object
     if(input ...){
       //...
       return true;
     }
     else
-      return aright.error('some error message...', 'myRule', null, null, path, 'should be a ...')
+      return aright.error('some error message...', 'myRule', null, null, path, 'string' /* what it should be */)
   });
 };
 
@@ -176,14 +177,14 @@ v().myRule().validate(...);
 ```javascript
 // handler that act on choosen property
 aright.Validator.prototype.myOtherRule = function(propertyName){
-  return this.exec(propertyName, function(input, path){
+  return this.enqueue(propertyName, function(input, path){
   // input is the value to test, and path is its path from root object
     if(input[propertyName] ...){
       //...
       return true;
     }
     else
-      return aright.error('some error message...', 'myOtherRule', input, null, path, 'should be a ...')
+      return aright.error('some error message...', 'myOtherRule', input, propertyName, path, 'string' /* what it should be */)
   });
 };
 
