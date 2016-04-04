@@ -18,11 +18,11 @@
 		path = key ? (path + key) : path;
 
 		if (!path)
-			path = '.';
+			path = 'root';
 
 		errors.valid = false;
 		errors.map[path] = errors.map[path] || {
-			value: key ? parent[key] : parent,
+			value: (parent && key) ? parent[key] : parent,
 			errors: []
 		};
 		var msg = i18n(rule);
