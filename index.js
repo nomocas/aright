@@ -7,6 +7,11 @@
 
 	var replaceShouldBeRegExp = /%s/g;
 
+	var i18n = function(rule, language) {
+		var space = i18n.data[language || i18n.currentLanguage];
+		return space[rule];
+	};
+
 	function error(errors, rule, parent, key, path, shouldBe) {
 		if (path && key)
 			path += '.';
@@ -29,37 +34,34 @@
 		return false;
 	}
 
-	var i18n = function(rule, language) {
-		var space = i18n.data[language || i18n.currentLanguage];
-		return space[rule];
-	};
-
 	i18n.currentLanguage = 'en';
 	i18n.data = {
 		en: {
-			string: "should be a string",
-			object: "should be an object",
-			array: "should be an array",
-			'boolean': "should be a boolean",
-			number: "should be a number",
-			'null': "should be null",
-			'enum': "enum failed (should be one of : %s)",
-			equal: "equality failed (should be : %s)",
-			format: "format failed",
-			unmanaged: "unmanaged property",
-			missing: "missing property",
-			minLength: "too short (length should be at least : %s)",
-			maxLength: "too long (length should be at max : %s)",
-			minimum: "too small (should be at minimum : %s)",
-			maximum: "too big (should be at max : %s)",
-			or: "'or' rule not satisfied",
-			not: "not rule not satisfied"
+			string: 'should be a string',
+			object: 'should be an object',
+			array: 'should be an array',
+			'boolean': 'should be a boolean',
+			number: 'should be a number',
+			'null': 'should be null',
+			'enum': 'enum failed (should be one of : %s)',
+			equal: 'equality failed (should be : %s)',
+			format: 'format failed',
+			unmanaged: 'unmanaged property',
+			missing: 'missing property',
+			minLength: 'too short (length should be at least : %s)',
+			maxLength: 'too long (length should be at max : %s)',
+			minimum: 'too small (should be at minimum : %s)',
+			maximum: 'too big (should be at max : %s)',
+			or: '"or" rule not satisfied',
+			not: '"not" rule not satisfied'
 		}
 	};
 
 	var formats = {
 		email: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
 	};
+
+	var rules = {};
 
 	function is(type) {
 		return function() {
@@ -310,9 +312,7 @@
 		return new Validator();
 	};
 
-	var rules = {
-		email: v().isString().format('email').minLength(6)
-	};
+	rules.email = v().isString().format('email').minLength(6);
 
 	var aright = {
 		v: v,
