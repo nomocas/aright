@@ -52,6 +52,7 @@
 			maxLength: 'too long (length should be at max : %s)',
 			minimum: 'too small (should be at minimum : %s)',
 			maximum: 'too big (should be at max : %s)',
+			instanceOf: 'should be %s',
 			or: '"or" rule not satisfied',
 			not: '"not" rule not satisfied'
 		}
@@ -173,9 +174,7 @@
 		or: function() {
 			var rules = [].slice.call(arguments);
 			return this.enqueue('this', function(input, path) {
-				var errors = {
-						map: {}
-					},
+				var errors = { map: {} }, // fake error object
 					ok = rules.some(function(rule) {
 						return rule.call(errors, input, path);
 					});
@@ -186,9 +185,7 @@
 		},
 		not: function(rule) {
 			return this.enqueue('this', function(input, path) {
-				var errors = {
-					map: {}
-				};
+				var errors = { map: {} }; // fake error object
 				if (rule.call(errors, input, path))
 					return error(this, 'not', input, null, path);
 				return true;
@@ -227,6 +224,9 @@
 				return true;
 			});
 		},
+		between: function(min, max) {
+			return this.minimum(min).maximum(max);
+		},
 		format: function(exp) {
 			if (typeof exp === 'string')
 				exp = formats[exp];
@@ -257,6 +257,14 @@
 			return this.enqueue('this', function(input, path) {
 				if (input !== value)
 					return error(this, 'equal', input, null, path, value);
+				return true;
+			});
+		},
+
+		instanceOf: function(cl) {
+			return this.enqueue('this', function(input, path) {
+				if (!(input instanceof cl))
+					return error(this, 'instanceOf', input, null, path, cl);
 				return true;
 			});
 		},
