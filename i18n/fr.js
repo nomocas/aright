@@ -13,5 +13,7 @@ module.exports = {
 	"minLength": "trop court (la longueur devrait être au minimum : %s)",
 	"maxLength": "trop long (la longueur devrait être au maximum : %s)",
 	"minimum": "trop petit (devrait être au minimum : %s)",
-	"maximum": "trop grand (devrait être au maximum : %s)"
+	"maximum": "trop grand (devrait être au maximum : %s)",
+	or: "règle 'or' non satisfaite",
+	not: "règle 'not' non satisfaite"
 };
