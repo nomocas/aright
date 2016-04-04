@@ -80,6 +80,12 @@ v().isNull().validate(null); //return true
 
 Sugar for .or(v().isString(), v().isObject(), ...)
 
+### .instanceOf(Class)
+
+```javascript
+var rule = v().instanceOf(Date),
+  result = rule.validate(new Date()); // return true
+```
 
 ### properties validation
 
