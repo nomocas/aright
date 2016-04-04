@@ -140,6 +140,18 @@ v().isObject()
 .validate(o); // return true
 ```
 
+### .not and .or
+
+```javascript
+var rule = v().or(v().isString(), v().isNumber()),
+    result = rule.validate('john@doe.com') && rule.validate(1); // return true
+```
+
+```javascript
+var rule = v().not(v().isString(), v().isNumber()),
+    result = rule.validate([]) && rule.validate(true); // return true
+```
+
 ### validation
 
 any value could be validated through aright rules by calling .validate( valueToTest ).
