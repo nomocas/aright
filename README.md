@@ -158,7 +158,7 @@ v().rule('myRule').validate('hello'); // return true
 ```javascript
 // handler that act on 'this' (as is* family)
 aright.Validator.prototype.myRule = function(){
-  return this.exec('this', function(input, path){
+  return this.enqueue('this', function(input, path){
   // input is the value to test, and path is its path from root object
     if(input ...){
       //...
@@ -177,7 +177,7 @@ v().myRule().validate(...);
 ```javascript
 // handler that act on choosen property
 aright.Validator.prototype.myOtherRule = function(propertyName){
-  return this.exec(propertyName, function(input, path){
+  return this.enqueue(propertyName, function(input, path){
   // input is the value to test, and path is its path from root object
     if(input[propertyName] ...){
       //...
