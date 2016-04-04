@@ -180,7 +180,7 @@
 						return rule.call(errors, input, path);
 					});
 				if (!ok)
-					return error(this, 'or', null, null, path);
+					return error(this, 'or', input, null, path);
 				return true;
 			});
 		},
@@ -190,7 +190,7 @@
 					map: {}
 				};
 				if (rule.call(errors, input, path))
-					return error(this, 'not', null, null, path);
+					return error(this, 'not', input, null, path);
 				return true;
 			});
 		},
