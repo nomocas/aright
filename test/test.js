@@ -356,12 +356,38 @@ describe("type fail", function() {
 	});
 });
 
+//_____________________ types
+
+describe("instanceOf success", function() {
+	var rule = v().instanceOf(Date),
+		result = rule.validate(new Date());
+	it("should", function() {
+		expect(result).to.equals(true);
+	});
+});
+
+describe("instanceOf fail", function() {
+	var rule = v().instanceOf(Date),
+		result = rule.validate(true);
+	it("should", function() {
+		expect(result).to.not.equals(true);
+	});
+});
+
+
 // ____________________ full rules
 
 describe("string + format + minLength", function() {
 	var result = v().isString().format(/abc/).minLength(6).validate('abcdef'); // return true
 	it("should", function() {
 		expect(result).to.equals(true);
+	});
+});
+
+describe("string + format + maxLength fail", function() {
+	var result = v().isString().format(/abc/).maxLength(6).validate('abcdefgh'); // return true
+	it("should", function() {
+		expect(result).to.not.equals(true);
 	});
 });
 
