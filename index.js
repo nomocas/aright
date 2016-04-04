@@ -51,7 +51,9 @@
 			minLength: "too short (length should be at least : %s)",
 			maxLength: "too long (length should be at max : %s)",
 			minimum: "too small (should be at minimum : %s)",
-			maximum: "too big (should be at max : %s)"
+			maximum: "too big (should be at max : %s)",
+			or: "'or' rule not satisfied",
+			not: "not rule not satisfied"
 		}
 	};
 
@@ -61,7 +63,7 @@
 
 	function is(type) {
 		return function() {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (typeof input !== type)
 					return error(this, type, input, null, path, type);
 				return true;
@@ -71,7 +73,7 @@
 
 	function prop(type) {
 		return function(name, rule) {
-			return this.exec(name, function(input, path) {
+			return this.enqueue(name, function(input, path) {
 				if (typeof input[name] === 'undefined') {
 					if (!rule || rule.required !== false)
 						return error(this, 'missing', input, name, path);
@@ -140,7 +142,7 @@
 					ok = error(errors, 'unmanaged', entry, i, path);
 			return ok;
 		},
-		exec: function(key, rule) {
+		enqueue: function(key, rule) {
 			if (typeof rule === 'string')
 				rule = rules[rule];
 			if (key === 'this')
@@ -156,11 +158,36 @@
 			}
 			if (typeof rule === 'string')
 				rule = rules[rule];
-			return this.exec(key || 'this', function(input, path) {
+			return this.enqueue(key || 'this', function(input, path) {
 				input = key ? input[key] : input;
 				if (key)
 					path = path ? (path + '.' + key) : key;
 				return rule.call(this, input, path);
+			});
+		},
+		//____________________________________
+		or: function() {
+			var rules = [].slice.call(arguments);
+			return this.enqueue('this', function(input, path) {
+				var errors = {
+						map: {}
+					},
+					ok = rules.some(function(rule) {
+						return rule.call(errors, input, path);
+					});
+				if (!ok)
+					return error(this, 'or', null, null, path);
+				return true;
+			});
+		},
+		not: function(rule) {
+			return this.enqueue('this', function(input, path) {
+				var errors = {
+					map: {}
+				};
+				if (rule.call(errors, input, path))
+					return error(this, 'not', null, null, path);
+				return true;
 			});
 		},
 		// ___________________________________ 
@@ -169,28 +196,28 @@
 			return this;
 		},
 		minLength: function(min) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (input.length < min)
 					return error(this, 'minLength', input, null, path, min);
 				return true;
 			});
 		},
 		maxLength: function(max) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (input.length > max)
 					return error(this, 'maxLength', input, null, path, max);
 				return true;
 			});
 		},
 		minimum: function(min) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (input < min)
 					return error(this, 'minimum', input, null, path, min);
 				return true;
 			});
 		},
 		maximum: function(max) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (input > max)
 					return error(this, 'maximum', input, null, path, max);
 				return true;
@@ -199,32 +226,31 @@
 		format: function(exp) {
 			if (typeof exp === 'string')
 				exp = formats[exp];
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (!exp.test(input))
 					return error(this, 'format', input, null, path);
 				return true;
 			});
 		},
 		enumerable: function(values) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (values.indexOf(input) === -1)
 					return error(this, 'enum', input, null, path, values.join(', '));
 				return true;
 			});
 		},
 		item: function(rule) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				var self = this,
-					index = 0,
-					ok = true;
-				input.forEach(function(item) {
-					ok = ok && rule.call(self, item, path + '.' + (index++));
+					index = 0;
+				return input.every(function(item) {
+					return rule.call(self, item, path + '.' + (index++));
 				});
-				return ok;
 			});
 		},
+
 		equal: function(value) {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (input !== value)
 					return error(this, 'equal', input, null, path, value);
 				return true;
@@ -237,14 +263,14 @@
 		isBool: is('boolean'),
 		isFunction: is('function'),
 		isArray: function() {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (typeof input !== 'object' || !input.forEach)
 					return error(this, 'array', input, null, path);
 				return true;
 			});
 		},
 		isNull: function() {
-			return this.exec('this', function(input, path) {
+			return this.enqueue('this', function(input, path) {
 				if (input !== null)
 					return error(this, 'null', input, null, path);
 				return true;
@@ -258,14 +284,14 @@
 		bool: prop('boolean'),
 		number: prop('number'),
 		'null': function(name) {
-			return this.exec(name, function(input, path) {
+			return this.enqueue(name, function(input, path) {
 				if (input[name] !== null)
 					return error(this, 'null', input, name, path);
 				return true;
 			});
 		},
 		array: function(name, rule) {
-			return this.exec(name, function(input, path) {
+			return this.enqueue(name, function(input, path) {
 				if (typeof input[name] === 'undefined') {
 					if (!rule || rule.required !== false)
 						return error(this, 'missing', input, name, path);
