@@ -76,6 +76,8 @@
 	function prop(type) {
 		return function(name, rule) {
 			return this.enqueue(name, function(input, path) {
+				if (!input)
+					return error(this, 'missing', input, name, path);
 				if (typeof input[name] === 'undefined') {
 					if (!rule || rule.required !== false)
 						return error(this, 'missing', input, name, path);
