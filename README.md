@@ -95,7 +95,7 @@ v().string('title', v().required())
 
 .required(false), .minLength(5), .maxLength(3), .minimum(7), .maximum(9), .enumerable(['foo', 'bar']), .equal('my value')
 
-Any value is required by default. Ony undefined will be seen as missing.
+Any value is required by default. Only undefined will be seen as missing.
 
 ```javascript
 v().required().validate(undefined); // return error report
