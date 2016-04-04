@@ -305,6 +305,41 @@ describe("email success", function() {
 	});
 });
 
+//_______________________ OR
+
+describe("or success", function() {
+	var rule = v().or(v().isString(), v().isNumber()),
+		result = rule.validate('john@doe.com') && rule.validate(1);
+	it("should", function() {
+		expect(result).to.equals(true);
+	});
+});
+
+describe("or fail", function() {
+	var rule = v().or(v().isString(), v().isNumber()),
+		result = rule.validate([]);
+	it("should", function() {
+		expect(result).to.not.equals(true);
+	});
+});
+//_______________________ NOT
+
+describe("not success", function() {
+	var rule = v().not(v().isString(), v().isNumber()),
+		result = rule.validate([]) && rule.validate(true);
+	it("should", function() {
+		expect(result).to.equals(true);
+	});
+});
+
+describe("not fail", function() {
+	var rule = v().not(v().isString(), v().isNumber()),
+		result = rule.validate('bloupi');
+	it("should", function() {
+		expect(result).to.not.equals(true);
+	});
+});
+
 // ____________________ full rules
 
 describe("string + format + minLength", function() {
