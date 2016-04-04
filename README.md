@@ -38,9 +38,9 @@ var rule = v()
 		)
 	)
 	.object('child',
-		v().string('title')
+    v().string('title')
 	)
-  	.bool('test');
+  .bool('test');
 
 rule.validate({
   email:'aaa@bbb.com',
@@ -76,9 +76,20 @@ v().isString().enumerable(['bloupi', 'foo']).validate('bloup'); // return error 
 v().isNull().validate(null); //return true
 ```
 
+### .type('string', 'object', ...)
+
+Sugar for .or(v().isString(), v().isObject(), ...)
+
+
 ### properties validation
 
-.bool(propName), .number(propName), .string(propName), .func(propName), .null(propName), .object(propName), .array(propName) 
+  .bool(propName, rule)
+  .number(propName, rule)
+  .string(propName, rule)
+  .func(propName, rule)
+  .null(propName, rule)
+  .object(propName, rule)
+  .array(propName, rule)
 
 ```javascript
 v().string('title', v().required())
@@ -93,12 +104,12 @@ v().string('title', v().required())
 
 ### value constraints
 
-.required(false), .minLength(5), .maxLength(3), .minimum(7), .maximum(9), .enumerable(['foo', 'bar']), .equal('my value')
+.required(false), .minLength(5), .maxLength(3), .minimum(7), .maximum(9), .enumerable(['foo', 12]), .equal('my value')
 
 Any value is required by default. Only undefined will be seen as missing.
 
 ```javascript
-v().required().validate(undefined); // return error report
+v().required(false).validate(undefined); // return true
 
 v().equal(12).validate(1); // return error report
 
@@ -154,7 +165,87 @@ var rule = v().not(v().isString(), v().isNumber()),
 
 ### validation
 
-any value could be validated through aright rules by calling .validate( valueToTest ).
+Any value could be validated by calling .validate( valueToTest ) on any aright rule.
+
+It returns true if rule is satisfied or an error report as follow if something fails : 
+
+```javascript
+var rule = v()
+  .isObject()
+  .string('email', v().format('email').required(false))
+  .number('index', v().equal(24))
+  .bool('flag')
+  .array('collection',
+    v().item(
+      v().isString()
+    )
+  )
+  .object('child',
+    v().string('title')
+  )
+  .bool('test');
+
+var result = rule.validate({
+  email: 'aaa@bbb',
+  index: 1,
+  flag: 'hello',
+  collection: [1],
+  child: null,
+  test: 3
+});
+
+/* result == {
+  "valid": false,
+  "map": {
+    "email": {
+      "value": "aaa@bbb",
+      "errors": [
+        "format failed"
+      ]
+    },
+    "index": {
+      "value": 1,
+      "errors": [
+        "equality failed (should be : 24)"
+      ]
+    },
+    "flag": {
+      "value": "hello",
+      "errors": [
+        "should be a boolean"
+      ]
+    },
+    "collection.0": {
+      "value": 1,
+      "errors": [
+        "should be a string"
+      ]
+    },
+    "child.title": {
+      "value": null,
+      "errors": [
+        "missing property"
+      ]
+    },
+    "test": {
+      "value": 3,
+      "errors": [
+        "should be a boolean"
+      ]
+    }
+  },
+  "value": {
+    "email": "aaa@bbb",
+    "index": 1,
+    "flag": "hello",
+    "collection": [
+      1
+    ],
+    "child": null,
+    "test": 3
+  }
+}*/
+```
 
 ### custom rule
 
