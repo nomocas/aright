@@ -259,6 +259,13 @@
 			});
 		},
 
+		type: function() {
+			var types = [];
+			for (var i = 0, len = arguments.length; i < len; ++i)
+				types.push(v()['is' + arguments[i][0].toUpperCase() + arguments[i].substring(1)]());
+			return this.or.apply(this, types);
+		},
+
 		isObject: is('object'),
 		isString: is('string'),
 		isNumber: is('number'),
