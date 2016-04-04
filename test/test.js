@@ -287,8 +287,6 @@ describe("required success", function() {
 	});
 });
 
-
-
 //_____________________ format
 
 describe("email fail", function() {
@@ -340,6 +338,24 @@ describe("not fail", function() {
 	});
 });
 
+//_____________________ types
+
+describe("type success", function() {
+	var rule = v().type('string', 'number'),
+		result = rule.validate('abc') && rule.validate(1);
+	it("should", function() {
+		expect(result).to.equals(true);
+	});
+});
+
+describe("type fail", function() {
+	var rule = v().type('string', 'number'),
+		result = rule.validate([]) && rule.validate(false);
+	it("should", function() {
+		expect(result).to.not.equals(true);
+	});
+});
+
 // ____________________ full rules
 
 describe("string + format + minLength", function() {
@@ -378,5 +394,85 @@ describe("full rule", function() {
 
 	it("should", function() {
 		expect(result).to.equals(true);
+	});
+});
+
+describe("full rule fail with report check", function() {
+	var rule = v()
+		.isObject()
+		.string('email', v().format('email').required(false))
+		.number('index', v().equal(24))
+		.bool('flag')
+		.array('collection',
+			v().item(
+				v().isString()
+			)
+		)
+		.object('child',
+			v().string('title')
+		)
+		.bool('test');
+
+	var result = rule.validate({
+		email: 'aaa@bbb',
+		index: 1,
+		flag: 'hello',
+		collection: [1],
+		child: null,
+		test: 3
+	});
+
+	it("should", function() {
+		expect(result).to.deep.equals({
+			"valid": false,
+			"map": {
+				"email": {
+					"value": "aaa@bbb",
+					"errors": [
+						"format failed"
+					]
+				},
+				"index": {
+					"value": 1,
+					"errors": [
+						"equality failed (should be : 24)"
+					]
+				},
+				"flag": {
+					"value": "hello",
+					"errors": [
+						"should be a boolean"
+					]
+				},
+				"collection.0": {
+					"value": 1,
+					"errors": [
+						"should be a string"
+					]
+				},
+				"child.title": {
+					"value": null,
+					"errors": [
+						"missing property"
+					]
+				},
+				"test": {
+					"value": 3,
+					"errors": [
+						"should be a boolean"
+					]
+				}
+			},
+			"value": {
+				"email": "aaa@bbb",
+				"index": 1,
+				"flag": "hello",
+				"collection": [
+					1
+				],
+				"child": null,
+				"test": 3
+			}
+		});
 	});
 });
