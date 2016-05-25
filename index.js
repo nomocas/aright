@@ -1,6 +1,6 @@
 /**
  * @author Gilles Coomans <gilles.coomans@gmail.com>
- *
+ * TODO : add  validationRule.getDefault()
  */
 (function(global) {
 	'use strict';
