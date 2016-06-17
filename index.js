@@ -111,6 +111,7 @@
 			errors.value = input;
 			return errors;
 		},
+		//______ INNER JOB METHODS
 		call: function(errors, entry, path) {
 			var ok = true;
 
@@ -156,6 +157,7 @@
 				this._rules[key] = rule;
 			return this;
 		},
+		//__________________ RULES METHODS
 		rule: function(key, rule) {
 			if (!rule) {
 				rule = key;
