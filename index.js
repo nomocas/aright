@@ -97,15 +97,16 @@
 
 	var Validator = function() {
 		this._rules = {};
+		this.isStrict = true;
 	};
 
 	Validator.prototype = {
-		validate: function(input) {
+		validate: function(input, path) {
 			var errors = {
 				valid: true,
 				map: {}
 			};
-			this.call(errors, input, '');
+			this.call(errors, input, path || '');
 			if (errors.valid)
 				return true;
 			errors.value = input;
@@ -142,10 +143,10 @@
 					keys[i] = false;
 					ok = ok && k;
 				}
-
-			for (i in keys)
-				if (keys[i])
-					ok = error(errors, 'unmanaged', entry, i, path);
+			if (this.isStrict)
+				for (i in keys)
+					if (keys[i])
+						ok = error(errors, 'unmanaged', entry, i, path);
 			return ok;
 		},
 		enqueue: function(key, rule) {
@@ -172,6 +173,10 @@
 				return rule.call(this, input, path);
 			});
 		},
+		strict: function(strict) {
+			this.isStrict = !!strict;
+			return this;
+		},
 		//____________________________________
 		or: function() {
 			var rules = [].slice.call(arguments);
@@ -191,6 +196,15 @@
 				if (rule.call(errors, input, path))
 					return error(this, 'not', input, null, path);
 				return true;
+			});
+		},
+		switch: function(name, map) {
+			return this.enqueue('this', function(input, path) {
+				var value = input[name],
+					rule = map[value] || map['default'];
+				if (!rule)
+					return true;
+				return rule.call(this, input, path);
 			});
 		},
 		// ___________________________________ 
@@ -297,7 +311,6 @@
 				return true;
 			});
 		},
-
 
 		object: prop('object'),
 		string: prop('string'),
