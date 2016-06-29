@@ -338,6 +338,27 @@ describe("not fail", function() {
 	});
 });
 
+//_______________________ SWITCH
+
+describe("switch string", function() {
+	var rule = v()
+		.switch('type', { 'string': v().string('type').string('foo'), 'number': v().string('type').number('foo') })
+		.strict(false),
+		result = rule.validate({ type: 'string', foo: 'bar' });
+	console.log('switch string : ', result.map);
+	it("should", function() {
+		expect(result).to.equals(true);
+	});
+});
+
+describe("switch number fail", function() {
+	var rule = v().switch('type', { 'string': v().string('type').string('foo'), 'number': v().string('type').number('foo') }),
+		result = rule.validate({ type: 'number', foo: 'bar' });
+	it("should", function() {
+		expect(result).to.not.equals(true);
+	});
+});
+
 //_____________________ types
 
 describe("type success", function() {
